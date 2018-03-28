@@ -1,3 +1,9 @@
+#toolbar{
+  box-sizing: border-box;
+}
+#canvas-container{
+  position: relative;
+}
 #target_canvas{
   background-color: #fff;
   background-image: linear-gradient(45deg, #ccc 25%, transparent 25%, transparent 75%, #ccc 75%, #ccc), linear-gradient(45deg, #ccc 25%, transparent 25%, transparent 75%, #ccc 75%, #ccc);
@@ -9,7 +15,7 @@
   background-color: #f90;
   border: 1px solid #f90;
   border-radius: 4px;
-  box-shadow: -2px -2px 2px #0003 inset;
+  /* box-shadow: -2px -2px 2px #0003 inset; */
   color: #fff;
   cursor: pointer;
   display: inline-block;
@@ -19,4 +25,17 @@
 }
 .number{
   width: 48px;
+}
+#watermark{
+  position: absolute;
+  top:0;
+  left:0;
+  cursor: move;
+  color: transparent;
+  font-family:cursive;
+  font-weight: bold;
+  font-size: 18px;
+}
+#watermark.selected{
+  color:#5BF;
 }

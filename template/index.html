@@ -11,22 +11,20 @@
 
 <body>
   <div id="app">
-    <a class="btn" id="btn_select_file" href="jacascript:void(0)">选择背景图</a>
-    <a class="btn" id="download_file" href="" download="目标图片">下载图片</a>
-    <input id="target_file" type="file" style="display:none" />
-    <p id="read_process"></p>
-    <canvas id="target_canvas" width="100" height="100">
-      浏览器不支持此功能，请升级
-    </canvas>
-    <br />
-    x:<input class="number" id="position_x" type="number" value="0"/>
-    y:<input class="number" id="position_y" type="number" value="0"/>
-    <br />
-    文本<input id="inject_text" type="text" placeholder="请输入水印文字"/>
-    字体尺寸<input class="number" id="text_size" type="number" value="16" />
-    字体颜色<input id="text_color" type="color" value="#ff0" />
-    <a class="btn" id="set_text" href="jacascript:void(0)">加入水印</a>
+    <div id="toolbar">
+      <a class="btn" id="btn_select_file" href="#">选择背景图</a>
+      <input id="target_file" type="file" style="display:none" />
+      <p id="read_process"></p>
+      <a class="btn" id="download_file" href="#" download="目标图片">下载图片</a>
+      <br /> 文本
+      <input id="inject_text" type="text" placeholder="请输入水印文字" />
+      <a class="btn" id="add_text" href="jacascript:void(0)">加入可移动水印</a>
+    </div>
+    <div id="canvas-container">
+      <canvas id="target_canvas" width="100" height="100">
+        浏览器不支持此功能，请升级
+      </canvas>
+    </div>
   </div>
 </body>
-
 </html>
