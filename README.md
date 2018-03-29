@@ -1,4 +1,4 @@
-# webpack4Hanzilu #
+# ImgModifier #
 
 给图片加上文字水印的功能
 
