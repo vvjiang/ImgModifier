@@ -263,6 +263,10 @@
           initWatermark();
           initCanvasInfo();
           bindEvent();
+          $(window).resize(function() {
+            // 窗口大小调整后canvas位置发生改变
+            initCanvasInfo();
+          });
         });
       })(watermarkInfo);
     </script>
