@@ -20,6 +20,7 @@
     "css-loader": "^0.28.9",
     "eslint": "^4.17.0",
     "eslint-config-airbnb": "^16.1.0",
+    "eslint-config-standard-deviation--es5": "^1.0.5",
     "eslint-plugin-import": "^2.8.0",
     "eslint-plugin-jsx-a11y": "^6.0.3",
     "eslint-plugin-promise": "^3.6.0",
@@ -35,9 +36,8 @@
     "webpack-dev-server": "^2.11.1"
   },
   "scripts": {
-    "dev": "webpack-dev-server --config webpack.dev.js",
-    "prod": "cross-env NODE_ENV=production webpack -p --config webpack.prod.js",
-    "build": "cross-env webpack -p --config webpack.prod.js"
+    "dev": "webpack-dev-server",
+    "build": "webpack"
   },
   "dependencies": {
     "axios": "^0.17.1",
