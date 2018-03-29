@@ -76,193 +76,195 @@
   </style>
   <div id="app">
     <div id="toolbar">
-      <a class="btn" id="btn_select_file" href="#">选择背景图</a>
+      <a class="btn" id="btn_select_file" href="jacascript:void(0)">选择背景图</a>
       <input id="target_file" type="file" style="display:none" />
       <input id="watermark_content" type="text" placeholder="请输入水印文字" />
       <a class="btn" id="btn_set_watermark" href="jacascript:void(0)">设置水印</a>
     </div>
     <div id="canvas-container"></div>
     <script>
-      var img = new Image();
       var watermarkInfo = {
-        fontSize: 18, // 像素值
-        fontFamily: 'cursive',
-        content: '',
-        color: '#fffbf0',
-        offsetX: 0,
-        offsetY: 0,
-        width: 0,
-        height: 0
-      };
-      var canvasInfo = {
-        width: 0,
-        height: 0
-      }
-      /**
-       * 重置水印
-       */
-      function resetWatermark() {
-        $('#watermark').text('').css({
-          top: 0,
-          left: 0,
-        });
-      };
-      /**
-       * 设置canvas图像到下载链接上
-       */
-      function setCanvasImgToDownloadLink() {
-        var imgData = document.getElementById('target_canvas').toDataURL();
-        $('#download_file').attr('href', imgData);
-      };
-      /**
-       * 设置Canvas高度和宽度
-       * @param {number} width
-       * @param {number} height
-       */
-      function setCanvasSize(width, height) {
-        canvasInfo.width = width;
-        canvasInfo.height = height;
-        $('#target_canvas').attr('width', width).attr('height', height);
-        // 解决图片过大时，在canvas-container不能根据canvas的宽度自动撑宽的问题
-        $('#app').css({
-          width: width < 500 ? 500 : width,
-        });
-      };
-      /**
-       * 加载图片资源到canvas中
-       * @param {File} imgFile
-       */
-      function setImgIntoCanvas(imgFile) {
-        var reader = new FileReader();
-
-        reader.onloadend = function (e) {
-          var dataURL = e.target.result;
-          img.onload = function (event) {
-            var ctx = document.getElementById('target_canvas').getContext('2d');
-            setCanvasSize(event.target.naturalWidth, event.target.naturalHeight);
-            ctx.drawImage(img, 0, 0);
-            setCanvasImgToDownloadLink();
-          };
-          img.src = dataURL;
+          fontSize: 18, // 像素值
+          fontFamily: 'cursive',
+          content: '',
+          color: '#fffbf0',
+          offsetX: 0,
+          offsetY: 0,
+          width: 0,
+          height: 0
         };
-        reader.readAsDataURL(imgFile);
-        resetWatermark();
-      };
+      (function(watermarkInfo) {
+        var img = new Image();
+        var canvasInfo = {
+          width: 0,
+          height: 0
+        }
+        /**
+         * 重置水印
+         */
+        function resetWatermark() {
+          $('#watermark').text('').css({
+            top: 0,
+            left: 0,
+          });
+        };
+        /**
+         * 设置canvas图像到下载链接上
+         */
+        function setCanvasImgToDownloadLink() {
+          var imgData = document.getElementById('target_canvas').toDataURL();
+          $('#download_file').attr('href', imgData);
+        };
+        /**
+         * 设置Canvas高度和宽度
+         * @param {number} width
+         * @param {number} height
+         */
+        function setCanvasSize(width, height) {
+          canvasInfo.width = width;
+          canvasInfo.height = height;
+          $('#target_canvas').attr('width', width).attr('height', height);
+          // 解决图片过大时，在canvas-container不能根据canvas的宽度自动撑宽的问题
+          $('#app').css({
+            width: width < 500 ? 500 : width,
+          });
+        };
+        /**
+         * 加载图片资源到canvas中
+         * @param {File} imgFile
+         */
+        function setImgIntoCanvas(imgFile) {
+          var reader = new FileReader();
 
-      // 设置文本到canvas中
-      var setTextIntoCanvas = function () {
-        var waterMarkPosition = $('#watermark').offset();
-        var x = waterMarkPosition.left - canvasInfo.left;
-        var y = waterMarkPosition.top - canvasInfo.top;
-        var ctx = document.getElementById('target_canvas').getContext('2d');
-        ctx.font = watermarkInfo.fontSize + 'px ' + watermarkInfo.fontFamily;
-        ctx.fillStyle = watermarkInfo.color;
-        ctx.fillText(watermarkInfo.content, x, y + watermarkInfo.fontSize);
-        setCanvasImgToDownloadLink();
-      };
+          reader.onloadend = function (e) {
+            var dataURL = e.target.result;
+            img.onload = function (event) {
+              var ctx = document.getElementById('target_canvas').getContext('2d');
+              //将canvas大小设置为和图片一样大
+              setCanvasSize(event.target.naturalWidth, event.target.naturalHeight);
+              ctx.drawImage(img, 0, 0);
+              setCanvasImgToDownloadLink();
+            };
+            img.src = dataURL;
+          };
+          reader.readAsDataURL(imgFile);
+          resetWatermark();
+        };
 
-      // 绑定移动水印相关事件
-      var bindEvent4DragWatermark = function () {
-        $('#watermark').on('dragstart', function (e) {
+        // 设置文本到canvas中
+        var setTextIntoCanvas = function () {
+          var waterMarkPosition = $('#watermark').offset();
+          var x = waterMarkPosition.left - canvasInfo.left;
+          var y = waterMarkPosition.top - canvasInfo.top;
           var ctx = document.getElementById('target_canvas').getContext('2d');
-          ctx.clearRect(0, 0, $('#target_canvas').width(), $('#target_canvas').height());
-          ctx.drawImage(img, 0, 0);
-          // 显示可拖拽水印
-          $(this).addClass('selected');
-          watermarkInfo.offsetX = e.originalEvent.offsetX + canvasInfo.left;
-          watermarkInfo.offsetY = e.originalEvent.offsetY + canvasInfo.top;
-        });
-        // 让水印跟着鼠标移动
-        $('#watermark').on('drag', function (e) {
-          var x = e.originalEvent.pageX;
-          var y = e.originalEvent.pageY;
-          if (x === 0 && y === 0) {
-            return;
-          }
-          x -= watermarkInfo.offsetX;
-          y -= watermarkInfo.offsetY;
+          ctx.font = watermarkInfo.fontSize + 'px ' + watermarkInfo.fontFamily;
+          ctx.fillStyle = watermarkInfo.color;
+          ctx.fillText(watermarkInfo.content, x, y + watermarkInfo.fontSize);
+          setCanvasImgToDownloadLink();
+        };
 
-          $('#watermark').css('left', x).css('top', y);
-        });
-        $('#watermark').on('dragend', function (e) {
-          // 调整位置，使水印无法超出canvas边界
-          var x = e.originalEvent.pageX - watermarkInfo.offsetX;
-          var y = e.originalEvent.pageY - watermarkInfo.offsetY;
-          if (x < 0) {
-            x = 0;
-          }
-          if (y < 0) {
-            y = 0;
-          }
+        // 绑定移动水印相关事件
+        var bindEvent4DragWatermark = function () {
+          $('#watermark').on('dragstart', function (e) {
+            var ctx = document.getElementById('target_canvas').getContext('2d');
+            ctx.clearRect(0, 0, $('#target_canvas').width(), $('#target_canvas').height());
+            ctx.drawImage(img, 0, 0);
+            // 显示可拖拽水印
+            $(this).addClass('selected');
+            watermarkInfo.offsetX = e.originalEvent.offsetX + canvasInfo.left;
+            watermarkInfo.offsetY = e.originalEvent.offsetY + canvasInfo.top;
+          });
+          // 让水印跟着鼠标移动
+          $('#watermark').on('drag', function (e) {
+            var x = e.originalEvent.pageX;
+            var y = e.originalEvent.pageY;
+            if (x === 0 && y === 0) {
+              return;
+            }
+            x -= watermarkInfo.offsetX;
+            y -= watermarkInfo.offsetY;
 
-          var maxX = canvasInfo.width - watermarkInfo.width;
-          var maxY = canvasInfo.height - watermarkInfo.height;
-          if (x > maxX) {
-            x = maxX;
-          }
-          if (y > maxY) {
-            y = maxY;
-          }
-          $('#watermark').css('left', x).css('top', y);
-          // 拖拽完水印，文本隐藏
-          $('#watermark').removeClass('selected');
-          setTextIntoCanvas();
-        });
-        // 让鼠标不显示禁用样式
-        $('#canvas-container').on('dragover', function (e) {
-          e.preventDefault();
-        });
-      }
+            $('#watermark').css('left', x).css('top', y);
+          });
+          $('#watermark').on('dragend', function (e) {
+            // 调整位置，使水印无法超出canvas边界
+            var x = e.originalEvent.pageX - watermarkInfo.offsetX;
+            var y = e.originalEvent.pageY - watermarkInfo.offsetY;
+            if (x < 0) {
+              x = 0;
+            }
+            if (y < 0) {
+              y = 0;
+            }
 
-      // 绑定事件
-      var bindEvent = function () {
-        $('#target_file').change(function (event) {
-          var imgFile = event.target.files[0];
-          setImgIntoCanvas(imgFile);
-        });
+            var maxX = canvasInfo.width - watermarkInfo.width;
+            var maxY = canvasInfo.height - watermarkInfo.height;
+            if (x > maxX) {
+              x = maxX;
+            }
+            if (y > maxY) {
+              y = maxY;
+            }
+            $('#watermark').css('left', x).css('top', y);
+            // 拖拽完水印，文本隐藏
+            $('#watermark').removeClass('selected');
+            setTextIntoCanvas();
+          });
+          // 让鼠标不显示禁用样式
+          $('#canvas-container').on('dragover', function (e) {
+            e.preventDefault();
+          });
+        }
 
-        // 按下选择的背景图
-        $('#btn_select_file').click(function () {
-          $('#target_file').click();
-        });
-        //设置水印
-        $('#btn_set_watermark').click(function () {
-          watermarkInfo.content = $('#watermark_content').val();
-          $('#watermark').text(watermarkInfo.content).show();
-          watermarkInfo.height = $('#watermark').height();
-          watermarkInfo.width = $('#watermark').width();
-          setTextIntoCanvas();
-        });
+        // 绑定事件
+        var bindEvent = function () {
+          // 按下选择的背景图
+          $('#btn_select_file').click(function () {
+            $('#target_file').click();
+          });
+          // 文件改变时获取文件，并文件渲染进canvas
+          $('#target_file').change(function (event) {
+            var imgFile = event.target.files[0];
+            setImgIntoCanvas(imgFile);
+          });
+          //设置水印
+          $('#btn_set_watermark').click(function () {
+            watermarkInfo.content = $('#watermark_content').val();
+            $('#watermark').text(watermarkInfo.content).show();
+            watermarkInfo.height = $('#watermark').height();
+            watermarkInfo.width = $('#watermark').width();
+            setTextIntoCanvas();
+          });
 
-        bindEvent4DragWatermark();
-      };
-      // 此处通过这种方式将html插入，是因为博客园自动屏蔽了canvas标签和download属性
-      var initHtmlConstruct = function () {
-        $('#canvas-container').text('').append('<canvas id="target_canvas" width="100" height="100">浏览器不支持此功能，请升级</canvas><span draggable="true" id="watermark"></span>')
-        $('#toolbar').append('<a class="btn" id="download_file" href="#" download="水印图片">下载合成图片</a>');
-        realctx = document.getElementById('target_canvas').getContext('2d');
-      }
-      // 初始化水印设置
-      var initWatermark = function () {
-        $('#watermark').css({
-          fontSize: watermarkInfo.fontSize + 'px',
+          bindEvent4DragWatermark();
+        };
+        // 此处通过这种方式将html插入，是因为博客园自动屏蔽了canvas标签和download属性
+        var initHtmlConstruct = function () {
+          $('#canvas-container').text('').append('<canvas id="target_canvas" width="100" height="100">浏览器不支持此功能，请升级</canvas><span draggable="true" id="watermark"></span>')
+          $('#toolbar').append('<a class="btn" id="download_file" href="#" download="水印图片">下载合成图片</a>');
+        }
+        // 初始化水印设置
+        var initWatermark = function () {
+          $('#watermark').css({
+            fontSize: watermarkInfo.fontSize + 'px',
+          });
+        }
+        // 初始化canvas信息
+        var initCanvasInfo = function () {
+          var $targetCanvas = $('#target_canvas');
+          var canvasPosition = $targetCanvas.offset()
+          canvasInfo.left = canvasPosition.left;
+          canvasInfo.top = canvasPosition.top;
+          canvasInfo.width = $targetCanvas.width();
+          canvasInfo.height = $targetCanvas.height();
+        }
+        $(function () {
+          initHtmlConstruct();
+          initWatermark();
+          initCanvasInfo();
+          bindEvent();
         });
-      }
-      // 初始化canvas信息
-      var initCanvasInfo = function () {
-        var $targetCanvas = $('#target_canvas');
-        var canvasPosition = $targetCanvas.offset()
-        canvasInfo.left = canvasPosition.left;
-        canvasInfo.top = canvasPosition.top;
-        canvasInfo.width = $targetCanvas.width();
-        canvasInfo.height = $targetCanvas.height();
-      }
-      $(function () {
-        initHtmlConstruct();
-        initWatermark();
-        initCanvasInfo();
-        bindEvent();
-      });
+      })(watermarkInfo);
     </script>
   </div>
 </body>
