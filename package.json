@@ -1,7 +1,7 @@
 {
   "name": "webpack-demo",
   "version": "1.0.0",
-  "description": "webpack的使用demo",
+  "description": "给图片加上文字水印的功能",
   "main": "index.js",
   "author": "韩子卢",
   "license": "MIT",
