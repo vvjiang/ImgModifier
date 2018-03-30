@@ -7,20 +7,22 @@
   <link rel="shortcut icon" sizes="16x16" href="src/images/favicon_16.ico">
   <link rel="shortcut icon" sizes="32x32" href="src/images/favicon_32.ico">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <script src='https://common.cnblogs.com/script/jquery.js'></script>
+  <script src="https://cdn.bootcss.com/jquery/2.2.0/jquery.min.js"></script>
 </head>
 
 <body>
   <style>
-    #toolbar {
+    /* 给每个样式前面都加上 #app_watermark ，以此避免与其它样式冲突的可能性*/
+
+    #app_watermark #toolbar {
       box-sizing: border-box;
     }
 
-    #canvas-container {
+    #app_watermark #canvas-container {
       position: relative;
     }
 
-    #target_canvas {
+    #app_watermark #target_canvas {
       background-color: #fff;
       background-image: linear-gradient(45deg, #ccc 25%, transparent 25%, transparent 75%, #ccc 75%, #ccc), linear-gradient(45deg, #ccc 25%, transparent 25%, transparent 75%, #ccc 75%, #ccc);
       background-size: 20px 20px;
@@ -28,7 +30,7 @@
       border: 1px solid #ccc;
     }
 
-    #toolbar .btn {
+    #app_watermark #toolbar .btn {
       background-color: #8BC34A;
       border: 1px solid #4CAF50;
       border-radius: 4px;
@@ -42,22 +44,18 @@
       line-height: 20px;
     }
 
-    #toolbar .btn:hover {
+    #app_watermark #toolbar .btn:hover {
       background-color: #4CAF50;
     }
 
-    #watermark_content {
+    #app_watermark #watermark_content {
       line-height: 27px;
       vertical-align: top;
       border-radius: 4px;
       border: 1px solid #ccc;
     }
 
-    .number {
-      width: 48px;
-    }
-
-    #watermark {
+    #app_watermark #watermark {
       position: absolute;
       top: 0;
       left: 0;
@@ -70,11 +68,11 @@
       white-space: nowrap;
     }
 
-    #watermark.selected {
+    #app_watermark #watermark.selected {
       color: #5BF;
     }
   </style>
-  <div id="app">
+  <div id="app_watermark">
     <div id="toolbar">
       <a class="btn" id="btn_select_file" href="jacascript:void(0)">选择背景图</a>
       <input id="target_file" type="file" style="display:none" />
@@ -82,18 +80,21 @@
       <a class="btn" id="btn_set_watermark" href="jacascript:void(0)">设置水印</a>
     </div>
     <div id="canvas-container"></div>
-    <script>
+  </div>
+  <script>
+    // 给图片加水印相关代码
+    if ($('#app_watermark').length === 1) {
       var watermarkInfo = {
-          fontSize: 18, // 像素值
-          fontFamily: 'cursive',
-          content: '',
-          color: '#fffbf0',
-          offsetX: 0,
-          offsetY: 0,
-          width: 0,
-          height: 0
-        };
-      (function(watermarkInfo) {
+        fontSize: 18, // 像素值
+        fontFamily: 'cursive',
+        content: '',
+        color: '#fffbf0',
+        offsetX: 0,
+        offsetY: 0,
+        width: 0,
+        height: 0
+      };
+      (function (watermarkInfo) {
         var img = new Image();
         var canvasInfo = {
           width: 0,
@@ -125,7 +126,7 @@
           canvasInfo.height = height;
           $('#target_canvas').attr('width', width).attr('height', height);
           // 解决图片过大时，在canvas-container不能根据canvas的宽度自动撑宽的问题
-          $('#app').css({
+          $('#app_watermark').css({
             width: width < 500 ? 500 : width,
           });
         };
@@ -242,6 +243,7 @@
         var initHtmlConstruct = function () {
           $('#canvas-container').text('').append('<canvas id="target_canvas" width="100" height="100">浏览器不支持此功能，请升级</canvas><span draggable="true" id="watermark"></span>')
           $('#toolbar').append('<a class="btn" id="download_file" href="#" download="水印图片">下载合成图片</a>');
+          $('#watermark_content').attr('placeholder', '请输入水印文字');
         }
         // 初始化水印设置
         var initWatermark = function () {
@@ -252,25 +254,29 @@
         // 初始化canvas信息
         var initCanvasInfo = function () {
           var $targetCanvas = $('#target_canvas');
-          var canvasPosition = $targetCanvas.offset()
-          canvasInfo.left = canvasPosition.left;
-          canvasInfo.top = canvasPosition.top;
-          canvasInfo.width = $targetCanvas.width();
-          canvasInfo.height = $targetCanvas.height();
+          if ($targetCanvas.length === 1) {
+            var canvasPosition = $targetCanvas.offset()
+            canvasInfo.left = canvasPosition.left;
+            canvasInfo.top = canvasPosition.top;
+            canvasInfo.width = $targetCanvas.width();
+            canvasInfo.height = $targetCanvas.height();
+          }
         }
         $(function () {
-          initHtmlConstruct();
-          initWatermark();
-          initCanvasInfo();
-          bindEvent();
-          $(window).resize(function() {
-            // 窗口大小调整后canvas位置发生改变
+          if ($('#app_watermark').length === 1) {
+            initHtmlConstruct();
+            initWatermark();
             initCanvasInfo();
-          });
-        });
+            bindEvent();
+            $(window).resize(function () {
+              // 窗口大小调整后canvas位置发生改变
+              initCanvasInfo();
+            });
+          }
+        })
       })(watermarkInfo);
-    </script>
-  </div>
+    }
+  </script>
 </body>
 
 </html>
