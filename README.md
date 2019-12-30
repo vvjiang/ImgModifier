@@ -2,7 +2,7 @@
 
 已废弃，更换仓库地址为：
 
-https://gitee.com/wmvc/ImgModifier
+https://gitee.com/vvjiang/ImgModifier
 
 给图片加上文字水印的功能
 
